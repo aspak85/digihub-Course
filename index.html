@@ -132,6 +132,24 @@
   .purchase-toast .p-time{display:block;color:var(--muted-2);font-size:10.5px;margin-top:2px;}
   @media(max-width:520px){.purchase-toast{left:10px;right:10px;max-width:none;bottom:10px;}}
 </style>
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1330808999224121');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1330808999224121&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -289,7 +307,7 @@ document.getElementById('courseCarousel').innerHTML = CONFIG.courses.map(c => `
         <span class="course-price-old">₹${c.priceOld}</span>
         <span class="course-price-new">₹${c.priceNew}</span>
       </div>
-      <a class="course-buy-btn" href="${c.buyLink}" target="_blank" rel="noopener">⚡ Buy Now — Instant Access</a>
+      <a class="course-buy-btn" href="${c.buyLink}" target="_blank" rel="noopener" onclick="trackInitiateCheckout('${c.title.replace(/'/g,"\\'")}', ${c.priceNew})">⚡ Buy Now — Instant Access</a>
       <div class="course-note">Redirects to secure SuperProfile checkout</div>
     </div>
   </div>
@@ -305,6 +323,23 @@ document.getElementById('faqList').innerHTML = CONFIG.faq.map((f,i) => `
     <div class="faq-a"><p>${f.a}</p></div>
   </div>
 `).join('');
+
+/* ============================================================
+   Fires when someone clicks "Buy Now" — tells Meta this person
+   showed real purchase intent for this specific course. The
+   actual "Purchase" event (with confirmed payment) is tracked
+   separately by SuperProfile via Conversions API on its own
+   checkout page, since that's where payment actually happens.
+   ============================================================ */
+function trackInitiateCheckout(courseName, price){
+  if (typeof fbq === 'function') {
+    fbq('track', 'InitiateCheckout', {
+      content_name: courseName,
+      currency: 'INR',
+      value: price
+    });
+  }
+}
 
 function toggleFaq(i){
   const item = document.getElementById('faq-'+i);
